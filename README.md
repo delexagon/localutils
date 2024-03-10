@@ -4,11 +4,13 @@ Modified from https://github.com/pypa/sampleproject lmao
 Anyway, just like load this into pip  
 and then create a .python_utils directory in your home directory.  
 Then if you add a file to that directory like  
-```# test.py
+```
+# test.py
 def a():
     print(1)
 ```
 you can say stuff like
-```from localutils.test import a
+```
+from localutils.test import a
 ```
 interactively or from any python script in your computer.
