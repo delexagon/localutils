@@ -1,16 +1,21 @@
 import pathlib
 import os
-import importlib
+import importlib.machinery
 import sys
 
-def load_files(directory):
-    cwd = pathlib.Path.cwd()
-    os.chdir(directory)
-    for name in [x[:-3] for x in os.listdir() if x[-3:] == '.py']:
-        module = importlib.import_module(name)
-        globals()[name] = module
-        sys.modules[f'localutils.{name}'] = module
-    os.chdir(cwd)
+class LocalFinder(importlib.machinery.PathFinder):
+    def __init__(self, parent_module, folder):
+        self.parent_module = parent_module
+        self.folder = folder
 
-load_files(pathlib.Path.home()/'.python_utils')
-del pathlib,os,importlib,sys,load_files
+    def find_spec(self, module_path, a, b):
+        if module_path.startswith(f'{self.parent_module}.'):
+            script = module_path.split('.',1)[1]
+            full_path = self.folder/f'{script}.py'
+            if not full_path.is_file():
+                return None
+            loader = importlib.machinery.SourceFileLoader(module_path, str(full_path))
+            return importlib.machinery.ModuleSpec(module_path, loader)
+        return None
+
+sys.meta_path.append(LocalFinder('localutils', pathlib.Path.home()/'.python_utils'))
