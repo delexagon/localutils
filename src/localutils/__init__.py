@@ -18,4 +18,5 @@ class LocalFinder(importlib.machinery.PathFinder):
             return importlib.machinery.ModuleSpec(module_path, loader)
         return None
 
+sys.meta_path.append(LocalFinder('localutils', pathlib.Path('/etc/python_utils')))
 sys.meta_path.append(LocalFinder('localutils', pathlib.Path.home()/'.python_utils'))
